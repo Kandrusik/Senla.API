@@ -2,9 +2,11 @@ package testPet;
 
 import com.google.gson.JsonParser;
 import endPoint.EndPointPet;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import model.Category;
+import model.Oder;
 import model.Pet;
 import model.TagPet;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +22,7 @@ import java.util.Collections;
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
 import static utilsAPI.Status.AVAILABLE;
+import static utilsAPI.Status.TRUE;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("API tests for pet user")
@@ -48,24 +51,6 @@ public class TestPet {
 
 
     @Test
-    @Order(5)
-    @DisplayName("Get request from Pet ID")
-    public void testToGetRequestPetID() {
-
-        TagPet tag = new TagPet(13, "Oleg");
-        Category category = new Category(1, "Cat");
-        Pet pet = new Pet(24, category, "Missi", new ArrayList<>(), new ArrayList<>(Collections.singletonList(tag)), AVAILABLE);
-        
-        given().spec(requestSpec)
-                .when()
-                .body(pet)
-                .get(EndPointPet.PET)
-                .then()
-                .assertThat()
-                .body(matchesJsonSchema(jsonSchema));
-    }
-
-    @Test
     @Order(2)
     @DisplayName("Check status of ID")
     public void testGetStatus() {
@@ -81,24 +66,30 @@ public class TestPet {
         System.out.println(id);
     }
 
-    @Test
-    @Order(3)
-    @DisplayName("Check Gustav Klimt ID")
-    public void testLoginIn() {
-        Response response = given().spec(requestSpec)
-                .when()
-                .get(EndPointPet.INVENTORY);
-        response.prettyPrint();
-    }
 
     @Test
-    @Order(4)
-    @DisplayName("Check Gustav Klimt ID")
-    public void testPutPet() {
+    @Order(3)
+    @DisplayName("Post test of Pet")
+    public void testPostPet() {
         Response response = given().spec(requestSpec)
                 .when()
                 .post(EndPointPet.PET);
         response.prettyPrint();
+    }
 
+
+    @Test
+    @Order(4)
+    @DisplayName("Get request from Pet ID")
+    public void testToGetRequestPetID() {
+        Oder oder = new Oder(11, 23, 1, 2019, TRUE);
+
+        given().spec(requestSpec)
+                .accept(ContentType.JSON)
+                .when()
+                .body(oder)
+                .post(EndPointPet.ORDER)
+
+                .prettyPrint();
     }
 }
