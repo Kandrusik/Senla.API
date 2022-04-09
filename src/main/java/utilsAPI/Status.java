@@ -1,9 +1,17 @@
 package utilsAPI;
 
-public class Status {
+public enum Status {
 
-    public static final String AVAILABLE = "available";
-    public static final String PENDING = "pending";
-    public static final String SOLD = "sold";
-    public static final String TRUE = "true";
+    AVAILABLE ("available"),
+    PENDING ("pending"),
+    SOLD ("sold"),
+    TRUE ("true");
+
+
+    public final String label;
+
+    private Status(String label) {
+        this.label = label;
+    }
+
 }

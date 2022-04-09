@@ -1,21 +1,23 @@
 package model;
 
+import utilsAPI.Status;
+
 import java.util.List;
 
 public class Pet {
 
-    private long id;
+    private Integer id;
     private Category category;
     private String name;
     private List<String> photoUrls;
     private List<TagPet> tags;
-    private String status;
+    private Status status;
 
     public long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -51,27 +53,11 @@ public class Pet {
         this.tags = tags;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return "Pet{" +
-                "id=" + id +
-                ", category=" + category +
-                ", name='" + name + '\'' +
-                ", photoUrls=" + photoUrls +
-                ", tags=" + tags +
-                ", status='" + status + '\'' +
-                '}';
-    }
-
-    public Pet(long id, Category category, String name, List<String> photoUrls, List<TagPet> tags, String status) {
+    public Pet(Integer id, Category category, String name, List<String> photoUrls, List<TagPet> tags, Status status) {
         this.id = id;
         this.category = category;
         this.name = name;

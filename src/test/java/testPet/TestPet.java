@@ -1,95 +1,129 @@
 package testPet;
 
-import com.google.gson.JsonParser;
 import endPoint.EndPointPet;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import model.Category;
-import model.Oder;
 import model.Pet;
 import model.TagPet;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import utilsAPI.PetAPISpecification;
+import org.junit.jupiter.api.*;
 
-import java.io.File;
+import utilsAPI.APISpecification;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static utilsAPI.Status.AVAILABLE;
-import static utilsAPI.Status.TRUE;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DisplayName("API tests for pet user")
+@DisplayName("API tests of Pet")
 public class TestPet {
 
-    private static RequestSpecification requestSpec = PetAPISpecification.getRequestSpecification();
-    private static File jsonSchema = new File("src/test/resources/json/petJsonSchema.json");
-    private String GustavKlimtID = "";
 
-    @Test
     @Order(1)
+    @Test
     @DisplayName("Send POST with body")
-    public void testValidateJsonScheme() {
-        TagPet tag = new TagPet(13, "Oleg");
-        Category category = new Category(1, "Cat");
-        Pet pet = new Pet(24, category, "Missi", new ArrayList<>(), new ArrayList<>(Collections.singletonList(tag)), AVAILABLE);
+    public void testPostPet() {
 
-        given().spec(requestSpec)
-                .when()
+        APISpecification.installSpecification(APISpecification.getRequestSpecification(),APISpecification.getResponseSpec(200));
+
+        TagPet tags = new TagPet(29, "Oleg");
+        Category category = new Category(13, "Cat");
+        Pet pet = new Pet(43, category, "Missi", new ArrayList<>(), new ArrayList<>(Collections.singletonList(tags)), AVAILABLE);
+
+        given()
                 .body(pet)
+                .when()
                 .post(EndPointPet.PET)
                 .then()
-                .assertThat()
-                .body(matchesJsonSchema(jsonSchema));
+                .body("name",equalTo("Missi"));
     }
 
 
-    @Test
     @Order(2)
+    @Test
+    @DisplayName("Send PUT with body")
+    public void testPutPet(){
+
+        APISpecification.installSpecification(APISpecification.getRequestSpecification(),APISpecification.getResponseSpec(200));
+
+        TagPet tags = new TagPet(99, "Pasha");
+        Category category = new Category(101, "Dog");
+        Pet pet = new Pet(43, category, "Missi", new ArrayList<>(), new ArrayList<>(Collections.singletonList(tags)), AVAILABLE);
+
+        given()
+                .body(pet)
+                .when()
+                .put(EndPointPet.PET)
+                .then()
+                .body("name",equalTo("Missi"))
+                .statusCode(200);
+    }
+
+
+    @Order(3)
+    @Test
+    @DisplayName("Send GET Pet")
+    public void testGetPet(){
+
+        APISpecification.installSpecification(APISpecification.getRequestSpecification(),APISpecification.getResponseSpec(200));
+
+        given()
+                .when()
+                .get(EndPointPet.PET + "/43")
+                .prettyPeek()
+                .then()
+                .body("name", equalTo("Missi"));
+    }
+
+
+    @Order(4)
+    @Test
+    @DisplayName("Send POST Pet of ID")
+    public void testPostPetId() {
+
+        APISpecification.installSpecification(APISpecification.getRequestSpecificationWithXForm(),APISpecification.getResponseSpec(200));
+
+        given()
+                .formParam("name", "One")
+                .formParam("status", "Eagle")
+                .when()
+                .post(EndPointPet.PET + "/43")
+                .prettyPeek()
+                .then()
+                .body("code", equalTo(200));
+    }
+
+
+    @Order(5)
+    @Test
+    @DisplayName("Send DELETE Pet")
+    public void testDeletePet() {
+
+        APISpecification.installSpecification(APISpecification.getRequestSpecification(),APISpecification.getResponseSpec(200));
+
+        given()
+                .when()
+                .delete(EndPointPet.PET + "/43")
+                .prettyPeek()
+                .then().statusCode(200);
+    }
+
+
+    @Order(6)
+    @Test
     @DisplayName("Check status of ID")
-    public void testGetStatus() {
-        Response response = given().spec(requestSpec)
+    public void testGetStatusAvailable() {
+
+        APISpecification.installSpecification(APISpecification.getRequestSpecification(),APISpecification.getResponseSpec(200));
+
+        Response response = given()
                 .when()
                 .get(EndPointPet.STATUS + "?status=available");
         response.prettyPrint();
-
-        String responseBody = response.getBody().asString();
-        JsonParser parser = new JsonParser();
-        Long id = parser.parse(responseBody).getAsJsonArray().get(0).getAsJsonObject().get("id").getAsLong();
-
+        Long id = response.getBody().jsonPath().get("id[0]");
         System.out.println(id);
-    }
-
-
-    @Test
-    @Order(3)
-    @DisplayName("Post test of Pet")
-    public void testPostPet() {
-        Response response = given().spec(requestSpec)
-                .when()
-                .post(EndPointPet.PET);
-        response.prettyPrint();
-    }
-
-
-    @Test
-    @Order(4)
-    @DisplayName("Get request from Pet ID")
-    public void testToGetRequestPetID() {
-        Oder oder = new Oder(11, 23, 1, 2019, TRUE);
-
-        given().spec(requestSpec)
-                .accept(ContentType.JSON)
-                .when()
-                .body(oder)
-                .post(EndPointPet.ORDER)
-
-                .prettyPrint();
     }
 }

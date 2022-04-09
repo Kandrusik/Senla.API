@@ -2,18 +2,20 @@ package model;
 
 public class Oder {
 
-    private long id;
-    private long petId;
-    private long quantity;
-    private long shipDate;
+    private Long id;
+    private Long petId;
+    private Long quantity;
+    private final String shipDate;
     private String status;
+    private final Boolean complete;
 
-    public Oder(long id, long petId, long quantity, long shipDate, String status) {
+    public Oder(long id, long petId, long quantity, String shipDate, String status, boolean complete) {
         this.id = id;
         this.petId = petId;
         this.quantity = quantity;
         this.shipDate = shipDate;
         this.status = status;
+        this.complete = complete;
     }
 
     @Override
@@ -22,8 +24,9 @@ public class Oder {
                 "id=" + id +
                 ", petId=" + petId +
                 ", quantity=" + quantity +
-                ", shipDate=" + shipDate +
+                ", shipDate='" + shipDate + '\'' +
                 ", status='" + status + '\'' +
+                ", complete=" + complete +
                 '}';
     }
 
@@ -49,14 +52,6 @@ public class Oder {
 
     public void setQuantity(long quantity) {
         this.quantity = quantity;
-    }
-
-    public long getShipDate() {
-        return shipDate;
-    }
-
-    public void setShipDate(long shipDate) {
-        this.shipDate = shipDate;
     }
 
     public String getStatus() {
